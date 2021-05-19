@@ -1,0 +1,5 @@
+package ua.lviv.iot.enums;
+
+public enum DeviceType {
+    MECHANICS,ELECTRICITY_AND_MAGNETISM,MOLECULAR_PHYSICS_AND_THERMODYNAMICS,OPTICS
+}
