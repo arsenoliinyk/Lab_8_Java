@@ -1,42 +1,46 @@
 package ua.lviv.iot.service;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
+import ua.lviv.iot.dal.DeviceRepository;
+import ua.lviv.iot.exeptions.DevicesOfOpticsNotFoundExeption;
 import ua.lviv.iot.models.DevicesOfOptics;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Service
 @ApplicationScope
 public class DeviceService {
+    @Autowired
+    private DeviceRepository repository;
 
-    private AtomicInteger id = new AtomicInteger(0);
-    private Map<Integer, DevicesOfOptics> devicesMap = new HashMap<Integer, DevicesOfOptics>();
-
-    public DevicesOfOptics addDeviceOfOptics(DevicesOfOptics deviceOfOptics){
-        Integer deviceOfOpticsId = id.incrementAndGet();
-        deviceOfOptics.setId(deviceOfOpticsId);
-        devicesMap.put(deviceOfOpticsId, deviceOfOptics);
-        return deviceOfOptics;
+    public DevicesOfOptics addDeviceOfOptics(DevicesOfOptics deviceOfOptics) {
+        return repository.save(deviceOfOptics);
     }
 
-    public DevicesOfOptics updateDeviceOfOptics(DevicesOfOptics deviceOfOptics){
-        return devicesMap.put(deviceOfOptics.getId(), deviceOfOptics);
+    public DevicesOfOptics updateDeviceOfOptics(DevicesOfOptics deviceOfOptics) throws DevicesOfOpticsNotFoundExeption {
+        if (repository.existsById(deviceOfOptics.getId())) {
+            return repository.save(deviceOfOptics);
+        }
+        throw new DevicesOfOpticsNotFoundExeption("DevicesOfOptics with id:" + deviceOfOptics.getId() + " npt found in the system.");
     }
 
-    public List<DevicesOfOptics> getDevicesOfOptics(){
-        return devicesMap.values().stream().collect(Collectors.toList());
+    public List<DevicesOfOptics> getDevicesOfOptics() {
+        return repository.findAll();
     }
 
     public DevicesOfOptics getDeviceOfOptics(Integer id) {
-        return devicesMap.get(id);
+        return repository.findById(id).orElse(null);
     }
 
     public DevicesOfOptics deleteDeviceOfOptics(Integer id) {
-        return devicesMap.remove(id);
+        DevicesOfOptics deviceOfOptics = repository.findById(id).orElseThrow();
+        if (deviceOfOptics == null) {
+            return null;
+        }
+        repository.deleteById(id);
+        return deviceOfOptics;
     }
+
 }
