@@ -2,6 +2,7 @@ package ua.lviv.iot.models;
 
 import lombok.*;
 
+import org.springframework.objenesis.instantiator.annotations.Instantiator;
 import ua.lviv.iot.enums.Country;
 import ua.lviv.iot.enums.DeviceType;
 import ua.lviv.iot.enums.Equipment;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "devices")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class DevicesOfOptics extends Devices{
 
     private String lens;
